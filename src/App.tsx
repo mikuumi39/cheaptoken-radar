@@ -1,0 +1,458 @@
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { HashRouter, Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import Calculator from "./components/Calculator";
+import DecisionBoard from "./components/DecisionBoard";
+import ErrorBoundary from "./components/ErrorBoundary";
+import PitfallNote from "./components/PitfallNote";
+import PriceTable from "./components/PriceTable";
+import Reveal from "./components/Reveal";
+import { IconAlert, IconArrow, IconCalc, IconCheck, IconCurve, IconLedger, IconMoon, IconRadar, IconRefresh, IconSun } from "./components/icons";
+import { FULL_PRICING } from "./data/fullPricing";
+import { I18nProvider, LANGS, UNIT_NOTES_TR, useI18n } from "./i18n";
+import { ThemeProvider, useTheme } from "./theme";
+
+// 即時監測頁（含 Recharts）較重，延遲到進入 /full 路由時才載入
+const LiveBoard = lazy(() => import("./components/LiveBoard"));
+
+const FULL_MODEL_COUNT = FULL_PRICING.length;
+
+const NAV = [
+  { href: "#table", key: "navTable" },
+  { href: "#calc", key: "navCalc" },
+  { href: "#pitfall", key: "navPitfall" },
+  { href: "#decision", key: "navDecision" },
+] as const;
+
+/* ── 語言切換（简／繁／EN） ── */
+function LangSwitch() {
+  const { lang, setLang } = useI18n();
+  return (
+    <div className="flex items-center rounded-full border border-line-14 bg-fill-6 p-0.5" role="group" aria-label="Language">
+      {LANGS.map((l) => (
+        <button
+          key={l.id}
+          onClick={() => setLang(l.id)}
+          title={l.label}
+          className={`cursor-pointer rounded-full px-2.5 py-1 font-mono text-[11px] font-bold transition-all duration-200 ${
+            lang === l.id
+              ? "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-[0_2px_12px_rgba(139,92,246,0.5)]"
+              : "text-mist-500 hover:text-mist-100"
+          }`}
+        >
+          {l.short}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ── 首頁 Hero（macOS 風格統計門面） ── */
+function Hero() {
+  const { t } = useI18n();
+  const stats = [
+    { n: "12", label: t("heroStatPlatforms") },
+    { n: String(FULL_MODEL_COUNT), label: t("heroStatModels") },
+    { n: t("heroStatFloor"), label: "" },
+  ];
+  return (
+    <header className="pt-2 text-center">
+      <p className="glass-soft mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] font-bold tracking-[0.22em] text-violet-300">
+        <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        {t("heroBadge")}
+      </p>
+      <h1 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-black leading-[1.15] text-mist-100 sm:text-6xl">
+        {t("heroTitleA")}
+        <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
+          {t("heroTitleB")}
+        </span>
+      </h1>
+      <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-mist-500 sm:text-base">{t("heroDesc")}</p>
+
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        {stats.map((s) => (
+          <div key={s.label + s.n} className="glass flex min-w-[120px] flex-col items-center rounded-2xl px-6 py-3.5">
+            <span className="font-display text-2xl font-black text-violet-300">{s.n}</span>
+            {s.label && <span className="mt-0.5 font-mono text-[11px] text-mist-500">{s.label}</span>}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <a href="#table" onClick={(e) => { e.preventDefault(); document.querySelector("#table")?.scrollIntoView({ behavior: "smooth" }); }} className="btn-primary flex items-center gap-2 px-6 py-3 text-sm font-bold">
+          <IconLedger className="h-4 w-4" />
+          {t("navTable")}
+        </a>
+        <Link to="/full" className="btn-ghost flex items-center gap-2 px-6 py-3 text-sm font-bold">
+          <IconRadar className="h-4 w-4" />
+          {t("heroCta")}
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+/* ── 主題切換（白天／夜間） ── */
+function ThemeToggle() {
+  const { isDark, toggle } = useTheme();
+  const label = isDark ? "Switch to light mode" : "Switch to dark mode";
+  return (
+    <button
+      onClick={(e) => toggle({ x: e.clientX, y: e.clientY })}
+      title={label}
+      aria-label={label}
+      aria-pressed={isDark}
+      className="btn-ghost flex h-[30px] w-[30px] items-center justify-center !rounded-full"
+    >
+      {/* 雙圖標堆疊：主題切換時旋轉交錯變形 */}
+      <span className="theme-toggle-icon block h-4 w-4 text-violet-300">
+        <IconSun className="icon-sun h-4 w-4" />
+        <IconMoon className="icon-moon h-4 w-4" />
+      </span>
+    </button>
+  );
+}
+
+/* ── 頂部閱讀進度條 ── */
+function ReadProgress() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      const p = max > 0 ? Math.min(doc.scrollTop / max, 1) : 0;
+      el.style.transform = `scaleX(${p})`;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+  return <div ref={ref} className="read-progress" style={{ transform: "scaleX(0)" }} aria-hidden />;
+}
+
+/* ── macOS Dock 式行動端底部錨點導航 ── */
+const DOCK_ITEMS = [
+  { href: "#table", key: "navTable", Icon: IconRadar },
+  { href: "#calc", key: "navCalc", Icon: IconCalc },
+  { href: "#pitfall", key: "navPitfall", Icon: IconAlert },
+  { href: "#decision", key: "navDecision", Icon: IconCheck },
+] as const;
+
+function MobileDock() {
+  const { t } = useI18n();
+  const [active, setActive] = useState<string>("#table");
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+    // 滾動偵測當前所在區塊，高亮對應 dock 圖標
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) setActive("#" + e.target.id);
+        }
+      },
+      { rootMargin: "-30% 0px -55% 0px" },
+    );
+    for (const it of DOCK_ITEMS) {
+      const el = document.querySelector(it.href);
+      if (el) io.observe(el);
+    }
+    return () => io.disconnect();
+  }, [pathname]);
+
+  if (pathname !== "/") return null;
+
+  const go = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <nav className="dock lg:!hidden" aria-label="Sections">
+      {DOCK_ITEMS.map(({ href, key, Icon }) => (
+        <a key={href} href={href} onClick={(e) => go(e, href)} className={`dock-item ${active === href ? "is-active" : ""}`} aria-label={t(key)} title={t(key)}>
+          <Icon className="h-[19px] w-[19px]" />
+          <span className="text-[9px] font-bold leading-none">{t(key)}</span>
+        </a>
+      ))}
+      <span className="mx-1 h-8 w-px self-center bg-line-10" />
+      <a
+        href="#top"
+        onClick={(e) => {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        className="dock-item"
+        aria-label={t("backToTop")}
+        title={t("backToTop")}
+      >
+        <IconArrow className="h-[19px] w-[19px] -rotate-90" />
+        <span className="text-[9px] font-bold leading-none">TOP</span>
+      </a>
+    </nav>
+  );
+}
+
+/* ── 共用導覽列 ── */
+function NavBar() {
+  const { t } = useI18n();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const handleSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const scroll = () => document.querySelector(href)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (pathname !== "/") {
+      navigate("/");
+      setTimeout(scroll, 90);
+    } else {
+      scroll();
+    }
+  };
+
+  return (
+    <nav className="sticky top-0 z-50 border-b border-line-8 bg-ink-950/70 backdrop-blur-2xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3">
+        <Link to="/" className="flex shrink-0 items-center gap-2.5">
+          <svg viewBox="0 0 24 24" className="h-7 w-7 drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]" aria-hidden>
+            <defs>
+              <linearGradient id="coin-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#a78bfa" />
+                <stop offset="100%" stopColor="#e879f9" />
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="10.5" fill="url(#coin-grad)" />
+            <circle cx="12" cy="12" r="7.2" fill="#0b0716" />
+            <text x="12" y="15.6" textAnchor="middle" fontSize="9.5" fontWeight="700" fontFamily="JetBrains Mono, monospace" fill="#c4b5fd">
+              ¥
+            </text>
+          </svg>
+          <span className="hidden font-display text-base font-black text-mist-100 sm:block">
+            {t("brand1")} <span className="text-violet-300">{t("brand2")}</span>
+          </span>
+        </Link>
+
+        <div className="hidden items-center gap-6 lg:flex">
+          {NAV.map((n) => (
+            <a key={n.href} href={n.href} onClick={(e) => handleSection(e, n.href)} className="text-xs font-bold text-mist-500 transition-colors duration-150 hover:text-violet-300">
+              {t(n.key)}
+            </a>
+          ))}
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2.5">
+          <ThemeToggle />
+          <LangSwitch />
+          <Link
+            to="/full"
+            className="btn-primary flex items-center gap-2 px-3 py-2 text-[11px] font-bold sm:px-5 sm:py-2.5 sm:text-xs"
+          >
+            <IconRadar className="hidden h-4 w-4 sm:block" />
+            <IconCurve className="h-4 w-4 sm:hidden" />
+            <span className="hidden md:inline">{t("fullBtn")}</span>
+            <span className="md:hidden">{t("lTitleB")}</span>
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ── 首頁（核心採購帳本） ── */
+function LedgerPage({ notify }: { notify: (msg: string) => void }) {
+  const { t } = useI18n();
+  return (
+    <main className="mx-auto max-w-6xl px-5 pb-36 pt-12 lg:pb-20">
+      <Reveal>
+        <Hero />
+      </Reveal>
+      <div className="mt-20 flex flex-col gap-20">
+        <Reveal>
+          <PriceTable notify={notify} />
+        </Reveal>
+        <Reveal>
+          <Calculator />
+        </Reveal>
+        <Reveal>
+          <PitfallNote />
+        </Reveal>
+        <Reveal>
+          <DecisionBoard />
+        </Reveal>
+      </div>
+
+      <footer className="mt-20 border-t border-line-8 pt-8">
+        <FooterNotes />
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="font-mono text-[11px] text-mist-500/70">2026 · {t("iqOfficialNote")}</p>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="cursor-pointer font-mono text-[11px] font-bold text-violet-400 transition-colors hover:text-violet-300">
+            ↑ {t("backToTop")}
+          </button>
+        </div>
+      </footer>
+    </main>
+  );
+}
+
+const UNIT_NOTES_TW = [
+  "價格單位：人民幣／100 萬 Token（M）；美元平台按約 ¥7.2/$ 粗算。",
+  "活動價通常有時間／新用戶／限購條件，購買前以官方頁面為準。",
+  "SCNet「純輸入包」僅計輸入價，快取／輸出欄位不適用（—）。",
+];
+
+function FooterNotes() {
+  const { lang } = useI18n();
+  const notes = lang === "zhTW" ? UNIT_NOTES_TW : UNIT_NOTES_TR[lang];
+  return (
+    <ul className="flex flex-col gap-1.5">
+      {notes.map((n) => (
+        <li key={n} className="text-xs leading-relaxed text-mist-500">
+          ・{n}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* ── 404 ── */
+function NotFound() {
+  const { t } = useI18n();
+  return (
+    <main className="mx-auto flex max-w-6xl flex-col items-center px-5 pb-32 pt-28 text-center">
+      <p className="font-display text-7xl font-black text-violet-300/60">404</p>
+      <h1 className="mt-4 font-display text-3xl font-black text-mist-100">{t("nfTitle")}</h1>
+      <p className="mt-3 text-sm text-mist-500">{t("nfDesc")}</p>
+      <Link to="/" className="btn-primary mt-8 flex items-center gap-2 px-6 py-3 text-sm font-bold">
+        <IconArrow className="h-4 w-4 rotate-180" />
+        {t("nfBack")}
+      </Link>
+    </main>
+  );
+}
+
+/* ── App：導覽列 + 路由 + Toast ── */
+export default function App() {
+  return (
+    <ThemeProvider>
+      <HashRouter>
+        <I18nProvider>
+          <Shell />
+        </I18nProvider>
+      </HashRouter>
+    </ThemeProvider>
+  );
+}
+
+/** 路由切換自動回到頂部（錨點導航不受影響） */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
+  return null;
+}
+
+function Shell() {
+  const { t } = useI18n();
+  const [toast, setToast] = useState<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const notify = useCallback((msg: string) => {
+    setToast(msg);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setToast(null), 3200);
+  }, []);
+
+  return (
+    <div id="top" className="relative min-h-screen overflow-x-clip">
+      <ScrollToTop />
+      {/* 環境光層 */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="orb orb-a" />
+        <div className="orb orb-b" />
+        <div className="orb orb-c" />
+      </div>
+
+      <NavBar />
+
+      <ErrorBoundary
+        fallback={(error, reset) => (
+          <main className="mx-auto flex max-w-6xl flex-col items-center px-5 pb-32 pt-28 text-center">
+            <p className="font-display text-7xl font-black text-rose-300/60">!</p>
+            <h1 className="mt-4 font-display text-3xl font-black text-mist-100">頁面發生錯誤</h1>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-mist-500">
+              執行階段出現未預期的問題。請重新整理頁面，或回到首頁。
+            </p>
+            {error?.message && (
+              <pre className="mt-4 max-w-full overflow-x-auto rounded-xl border border-rose-400/20 bg-rose-500/8 px-4 py-3 font-mono text-xs leading-relaxed text-rose-200/80">
+                {error.message}
+              </pre>
+            )}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={reset}
+                className="btn-primary flex cursor-pointer items-center gap-2 px-6 py-3 text-sm font-bold"
+              >
+                <IconRefresh className="h-4 w-4" />
+                重試
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="flex cursor-pointer items-center gap-2 rounded-full border border-line-14 bg-fill-6 px-6 py-3 text-sm font-bold text-mist-100"
+              >
+                重新整理
+              </button>
+            </div>
+          </main>
+        )}
+      >
+        <Routes>
+          <Route path="/" element={<LedgerPage notify={notify} />} />
+          <Route
+            path="/full"
+            element={
+              <Suspense
+                fallback={
+                  <main className="mx-auto flex min-h-[60vh] max-w-6xl items-center justify-center px-5">
+                    <div className="glass flex flex-col items-center gap-4 rounded-[1.75rem] px-12 py-9">
+                      <span className="spin-slow inline-block h-7 w-7 rounded-full border-2 border-violet-400/25 border-t-violet-400" />
+                      <p className="font-mono text-xs text-mist-500">{t("lLoading")}…</p>
+                    </div>
+                  </main>
+                }
+              >
+                <LiveBoard notify={notify} />
+              </Suspense>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ErrorBoundary>
+
+      <ReadProgress />
+      <MobileDock />
+
+      {toast && (
+        <div className="toast-in fixed bottom-24 left-1/2 z-[80] lg:bottom-6 flex w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 items-start gap-3 rounded-2xl border border-violet-400/40 bg-ink-850/90 px-4 py-3.5 shadow-[0_12px_48px_rgba(20,8,60,0.7),0_0_28px_rgba(139,92,246,0.18)] backdrop-blur-xl">
+          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-fuchsia-500 text-white">
+            <IconCheck className="h-3 w-3" strokeWidth={2.6} />
+          </span>
+          <p className="text-sm leading-snug text-mist-100">{toast}</p>
+        </div>
+      )}
+    </div>
+  );
+}
