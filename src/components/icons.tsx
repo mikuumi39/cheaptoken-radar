@@ -189,3 +189,15 @@ export const Medal = ({ kind, className = "" }: { kind: "gold" | "silver" | "bro
     </svg>
   );
 };
+
+/** 禮物盒：白嫖／福利入口 */
+export const IconGift = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="4" y="9" width="16" height="3.4" rx="1" />
+    <path d="M12 12.4v8.1" />
+    <path d="M5.5 12.4v6.1a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-6.1" />
+    <path d="M12 12.4V9" />
+    <path d="M12 9c0-3.5 1.7-5.3 3.5-4.8 1.3.4 1.1 2-.5 3.2-1 .7-2.3 1.1-3 1.6z" />
+    <path d="M12 9c0-3.5-1.7-5.3-3.5-4.8-1.3.4-1.1 2 .5 3.2 1 .7 2.3 1.1 3 1.6z" />
+  </svg>
+);

@@ -45,6 +45,7 @@ const S = {
   navCalc: { zhCN: "月成本试算", zhTW: "月成本試算", en: "Cost Sim" },
   navPitfall: { zhCN: "计价的坑", zhTW: "計價的坑", en: "The Trap" },
   navDecision: { zhCN: "需求对照", zhTW: "需求對照", en: "Decisions" },
+  navFreebie: { zhCN: "白嫖速报", zhTW: "白嫖速報", en: "Freebies" },
   fullBtn: { zhCN: "较为全面的 API 价格总结", zhTW: "較為全面的 API 價格總結", en: "Full API Price Monitor" },
   backToTop: { zhCN: "回到顶部", zhTW: "回到頂部", en: "Back to top" },
 
@@ -151,6 +152,9 @@ const S = {
     zhTW: "不想算？八種典型買法，照著拿。這頁的全部精華也在匯出的 Excel 第二個工作表裡。",
     en: "Don't want to do math? Eight typical buying plays — take them as-is. All of this is also in sheet 2 of the Excel export.",
   },
+
+  // 05 白嫖速报
+  fbTitle: { zhCN: "白嫖速报", zhTW: "白嫖速報", en: "Freeload Radar" },
 
   // 全面页
   lTitleA: { zhCN: "较为全面的", zhTW: "較為全面的", en: "The Full-Spectrum" },
@@ -372,7 +376,7 @@ export const DECISIONS_TR: Record<"zhCN" | "en", { need: string; pick: string; n
     { need: "💰 长期便宜 API", pick: "SiliconFlow", note: "明码按量计费，价格稳定" },
     { need: "🧠 便宜＋较强模型", pick: "Qwen3-235B / DeepSeek-V4-Flash", note: "输入、输出两头都便宜" },
     { need: "💻 Coding / Agent", pick: "MiniMax-M2.5 / M3", note: "编程场景性价比不错" },
-    { need: "🎁 白嫖", pick: "智谱 GLM-4.7-Flash / OpenRouter Free", note: "¥0 起步，先跑再说" },
+    { need: "🎁 白嫖", pick: "Space Bunny（限时）／智谱 GLM-4.7-Flash", note: "白嫖速报见上，¥0 起步先跑再说" },
     { need: "🔀 喜欢折腾 Provider", pick: "OpenRouter", note: "同一模型多家比价" },
     { need: "📦 ¥30 左右包月", pick: "SCNet 60,000 Credits", note: "定额包，用量好预估" },
     { need: "🆕 薅新人额度", pick: "百炼 / SiliconFlow / 火山引擎", note: "各平台新用户活动" },
@@ -382,7 +386,7 @@ export const DECISIONS_TR: Record<"zhCN" | "en", { need: string; pick: string; n
     { need: "💰 Cheap long-term API", pick: "SiliconFlow", note: "Transparent pay-as-you-go, stable pricing" },
     { need: "🧠 Cheap + strong model", pick: "Qwen3-235B / DeepSeek-V4-Flash", note: "Cheap on both input and output" },
     { need: "💻 Coding / Agent", pick: "MiniMax-M2.5 / M3", note: "Great value for coding workloads" },
-    { need: "🎁 Free tier", pick: "Zhipu GLM-4.7-Flash / OpenRouter Free", note: "Starts at ¥0 — just run it" },
+    { need: "🎁 Free tier", pick: "Space Bunny (limited) / Zhipu GLM-4.7-Flash", note: "Freebie radar above — starts at ¥0, just run it" },
     { need: "🔀 Provider hopping", pick: "OpenRouter", note: "Compare providers for the same model" },
     { need: "📦 ~¥30 monthly pack", pick: "SCNet 60,000 Credits", note: "Fixed quota, predictable usage" },
     { need: "🆕 New-user credits", pick: "Bailian / SiliconFlow / Volcano Engine", note: "New-user promos across platforms" },

@@ -253,7 +253,7 @@ export const DECISIONS: Decision[] = [
   { need: "💰 長期便宜 API", pick: "SiliconFlow", note: "明碼按量計費，價格穩定" },
   { need: "🧠 便宜＋較強模型", pick: "Qwen3-235B / DeepSeek-V4-Flash", note: "輸入、輸出兩頭都便宜" },
   { need: "💻 Coding / Agent", pick: "MiniMax-M2.5 / M3", note: "編程場景性價比不錯" },
-  { need: "🎁 白嫖", pick: "智譜 GLM-4.7-Flash / OpenRouter Free", note: "¥0 起步，先跑再說" },
+  { need: "🎁 白嫖", pick: "Space Bunny（限時）／智譜 GLM-4.7-Flash", note: "白嫖速報見上，¥0 起步先跑再說" },
   { need: "🔀 喜歡折騰 Provider", pick: "OpenRouter", note: "同一模型多家比價" },
   { need: "📦 ¥30 左右包月", pick: "SCNet 60,000 Credits", note: "定額包，用量好預估" },
   { need: "🆕 薅新人額度", pick: "百煉 / SiliconFlow / 火山引擎", note: "各平台新用戶活動" },

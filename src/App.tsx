@@ -3,10 +3,11 @@ import { HashRouter, Link, Route, Routes, useLocation, useNavigate } from "react
 import Calculator from "./components/Calculator";
 import DecisionBoard from "./components/DecisionBoard";
 import ErrorBoundary from "./components/ErrorBoundary";
+import FreebieFlash from "./components/FreebieFlash";
 import PitfallNote from "./components/PitfallNote";
 import PriceTable from "./components/PriceTable";
 import Reveal from "./components/Reveal";
-import { IconAlert, IconArrow, IconCalc, IconCheck, IconCurve, IconLedger, IconMoon, IconRadar, IconRefresh, IconSun } from "./components/icons";
+import { IconAlert, IconArrow, IconCalc, IconCheck, IconCurve, IconGift, IconLedger, IconMoon, IconRadar, IconRefresh, IconSun } from "./components/icons";
 import { FULL_PRICING } from "./data/fullPricing";
 import { I18nProvider, LANGS, UNIT_NOTES_TR, useI18n } from "./i18n";
 import { ThemeProvider, useTheme } from "./theme";
@@ -18,6 +19,7 @@ const FULL_MODEL_COUNT = FULL_PRICING.length;
 
 const NAV = [
   { href: "#table", key: "navTable" },
+  { href: "#freebie", key: "navFreebie" },
   { href: "#calc", key: "navCalc" },
   { href: "#pitfall", key: "navPitfall" },
   { href: "#decision", key: "navDecision" },
@@ -144,6 +146,7 @@ function ReadProgress() {
 /* ── macOS Dock 式行動端底部錨點導航 ── */
 const DOCK_ITEMS = [
   { href: "#table", key: "navTable", Icon: IconRadar },
+  { href: "#freebie", key: "navFreebie", Icon: IconGift },
   { href: "#calc", key: "navCalc", Icon: IconCalc },
   { href: "#pitfall", key: "navPitfall", Icon: IconAlert },
   { href: "#decision", key: "navDecision", Icon: IconCheck },
@@ -280,6 +283,9 @@ function LedgerPage({ notify }: { notify: (msg: string) => void }) {
         <Hero />
       </Reveal>
       <div className="mt-20 flex flex-col gap-20">
+        <Reveal>
+          <FreebieFlash />
+        </Reveal>
         <Reveal>
           <PriceTable notify={notify} />
         </Reveal>
