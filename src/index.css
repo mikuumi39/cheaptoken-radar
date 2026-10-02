@@ -385,18 +385,39 @@ body::after {
   animation-play-state: paused;
 }
 
-/* ═══════════════ 進場揭示 ═══════════════ */
+/* ═══════════════ 進場揭示（毛玻璃漸顯） ═══════════════
+
+   像「物体靠近毛玻璃」一样：从轻微模糊、半透明、上浮，
+   慢慢显现直到完全清晰。只动 opacity / transform / filter，
+   GPU 合成；will-change 在动画完成後自動釋放。 */
 
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 22px, 0);
+  transform: translate3d(0, 22px, 0) scale(0.985);
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
+  will-change: opacity, transform, filter;
   transition:
     opacity 0.75s ease,
-    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal.is-in {
   opacity: 1;
   transform: none;
+  filter: blur(0);
+  -webkit-filter: blur(0);
+  will-change: auto;
+}
+
+/* 触屏／小屏：模糊量减半、时长收短，把 GPU 预算留给滚动 */
+@media (max-width: 768px), (pointer: coarse) and (hover: none) {
+  .reveal {
+    filter: blur(6px);
+    -webkit-filter: blur(6px);
+    transform: translate3d(0, 14px, 0) scale(0.99);
+    transition-duration: 0.5s;
+  }
 }
 
 /* ═══════════════ 成本長條 ═══════════════ */
@@ -515,7 +536,10 @@ html:has(::view-transition-new(root)) {
   overflow: hidden;
 }
 
-/* 非 Chromium 瀏覽器兜底：切換瞬間全站顏色淡入 */
+/* 非 Chromium 瀏覽器兜底：切換瞬間全站顏色淡入。
+   注意：只過渡背景／文字／邊框三種顏色 —— box-shadow、fill、
+   stroke 等屬性一併過渡會在深色模式切換時把整頁重繪拖垮
+   （尤其玻璃卡片＋漂浮光球叠加時），所以這裡刻意排除掉。 */
 .theming,
 .theming *,
 .theming *::before,
@@ -523,10 +547,15 @@ html:has(::view-transition-new(root)) {
   transition:
     background-color 0.5s ease,
     color 0.5s ease,
-    border-color 0.5s ease,
-    fill 0.5s ease,
-    stroke 0.5s ease,
-    box-shadow 0.5s ease !important;
+    border-color 0.5s ease !important;
+}
+/* 一直在動的漂浮光球／跑馬燈不參與主題過渡，避免合成層爆炸 */
+.theming .orb,
+.theming .orb::before,
+.theming .orb::after,
+.theming .ticker-track,
+.theming .ticker-track * {
+  transition: none !important;
 }
 
 /* ═══════════════ 主題切換按鈕動畫 ═══════════════ */
