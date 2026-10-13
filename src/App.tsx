@@ -1,13 +1,11 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { HashRouter, Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import Calculator from "./components/Calculator";
 import DecisionBoard from "./components/DecisionBoard";
 import ErrorBoundary from "./components/ErrorBoundary";
 import FreebieFlash from "./components/FreebieFlash";
-import PitfallNote from "./components/PitfallNote";
 import PriceTable from "./components/PriceTable";
 import Reveal from "./components/Reveal";
-import { IconAlert, IconArrow, IconCalc, IconCheck, IconCurve, IconGift, IconLedger, IconMoon, IconRadar, IconRefresh, IconSun } from "./components/icons";
+import { IconArrow, IconCheck, IconCurve, IconGift, IconLedger, IconMoon, IconRadar, IconRefresh, IconSun } from "./components/icons";
 import { FULL_PRICING } from "./data/fullPricing";
 import { I18nProvider, LANGS, UNIT_NOTES_TR, useI18n } from "./i18n";
 import { ThemeProvider, useTheme } from "./theme";
@@ -20,8 +18,6 @@ const FULL_MODEL_COUNT = FULL_PRICING.length;
 const NAV = [
   { href: "#table", key: "navTable" },
   { href: "#freebie", key: "navFreebie" },
-  { href: "#calc", key: "navCalc" },
-  { href: "#pitfall", key: "navPitfall" },
   { href: "#decision", key: "navDecision" },
 ] as const;
 
@@ -147,8 +143,6 @@ function ReadProgress() {
 const DOCK_ITEMS = [
   { href: "#table", key: "navTable", Icon: IconRadar },
   { href: "#freebie", key: "navFreebie", Icon: IconGift },
-  { href: "#calc", key: "navCalc", Icon: IconCalc },
-  { href: "#pitfall", key: "navPitfall", Icon: IconAlert },
   { href: "#decision", key: "navDecision", Icon: IconCheck },
 ] as const;
 
@@ -288,12 +282,6 @@ function LedgerPage({ notify }: { notify: (msg: string) => void }) {
         </Reveal>
         <Reveal>
           <PriceTable notify={notify} />
-        </Reveal>
-        <Reveal>
-          <Calculator />
-        </Reveal>
-        <Reveal>
-          <PitfallNote />
         </Reveal>
         <Reveal>
           <DecisionBoard />
