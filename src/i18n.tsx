@@ -29,9 +29,9 @@ const S = {
   heroTitleA: { zhCN: "哪家 AI API 最便宜，", zhTW: "哪家 AI API 最便宜，", en: "Which AI API is cheapest — " },
   heroTitleB: { zhCN: "一眼定夺", zhTW: "一眼定奪", en: "see it at a glance" },
   heroDesc: {
-    zhCN: "把分散在各家平台的價格情報壓成一張能直接結帳的表：即時監測、成本試算、避坑指南、採購對照，一鍵匯出 Excel。",
-    zhTW: "把分散在各家平台的價格情報壓成一張能直接結帳的表：即時監測、成本試算、避坑指南、採購對照，一鍵匯出 Excel。",
-    en: "Every platform's pricing, distilled into one checkout-ready sheet: live monitoring, cost simulator, pitfall guide, buying plays — with one-click Excel export.",
+    zhCN: "各家平台价格统一成 ¥／百万 Token，一张表比价：试算月成本、看清计价陷阱、按需直接选，一键导出 Excel。",
+    zhTW: "各家平台價格統一成 ¥／百萬 Token，一張表比價：試算月成本、看清計價陷阱、按需求直接選，一鍵匯出 Excel。",
+    en: "Every platform's pricing in one ¥/1M table: compare, simulate monthly cost, dodge pricing traps, pick by need — export Excel in one click.",
   },
   heroStatPlatforms: { zhCN: "平台", zhTW: "平台", en: "platforms" },
   heroStatModels: { zhCN: "模型", zhTW: "模型", en: "models" },
@@ -46,7 +46,7 @@ const S = {
   navPitfall: { zhCN: "计价的坑", zhTW: "計價的坑", en: "The Trap" },
   navDecision: { zhCN: "需求对照", zhTW: "需求對照", en: "Decisions" },
   navFreebie: { zhCN: "白嫖速报", zhTW: "白嫖速報", en: "Freebies" },
-  fullBtn: { zhCN: "较为全面的 API 价格总结", zhTW: "較為全面的 API 價格總結", en: "Full API Price Monitor" },
+  fullBtn: { zhCN: "全面价格监测", zhTW: "全面價格監測", en: "Full Monitor" },
   backToTop: { zhCN: "回到顶部", zhTW: "回到頂部", en: "Back to top" },
 
   // 01 核心价格表
@@ -90,9 +90,9 @@ const S = {
   // 02 月成本试算
   cTitle: { zhCN: "你一个月实际会花多少？", zhTW: "你一個月實際會花多少？", en: "What will your month actually cost?" },
   cDesc: {
-    zhCN: "跑 OpenCode／Codex／Claude Code 的 Agent 循环会同时消耗输入、缓存与输出。拉动你的月用量，看看每家模型真实的月账单（缓存无价者以输入价保守估算）。",
-    zhTW: "跑 OpenCode／Codex／Claude Code 的 Agent 循環會同時消耗輸入、快取與輸出。拉動你的月用量，看看每家模型真實的月帳單（快取無價者以輸入價保守估算）。",
-    en: "Agent loops in OpenCode / Codex / Claude Code burn input, cache and output at once. Drag your monthly usage to see each model's real bill (no-cache-price models estimated at input price).",
+    zhCN: "拉动月用量，看每家模型真实月账单（按输入／缓存／输出分别计）。",
+    zhTW: "拉動月用量，看每家模型真實月帳單（按輸入／快取／輸出分別計）。",
+    en: "Drag monthly usage to see each model's real bill (input / cache / output).",
   },
   cUsage: { zhCN: "月用量设定", zhTW: "月用量設定", en: "Monthly usage" },
   cTotal: { zhCN: "合计 {n} M", zhTW: "合計 {n} M", en: "Total {n} M" },
@@ -135,9 +135,9 @@ const S = {
   },
   pFormula: { zhCN: "输入上下文 ＋ 缓存输入 ＋ 输出 ＋ Agent 循环", zhTW: "輸入上下文 ＋ 快取輸入 ＋ 輸出 ＋ Agent 循環", en: "Input context + cached input + output + agent loops" },
   pAlertC: {
-    zhCN: "实际上，输出价格往往比输入价格更影响你的钱包——长时间 Agent 编程，优先 SCNet V4-Flash／SiliconFlow V4-Flash／Qwen 系列，而不是单纯追求最强模型。",
-    zhTW: "實際上，輸出價格往往比輸入價格更影響你的錢包——長時間 Agent 編程，優先 SCNet V4-Flash／SiliconFlow V4-Flash／Qwen 系列，而不是單純追求最強模型。",
-    en: "In practice, output pricing hurts your wallet more than input pricing — for long agent coding sessions, prefer SCNet V4-Flash / SiliconFlow V4-Flash / Qwen over blindly chasing the strongest model.",
+    zhCN: "输出价往往更伤钱包。长时间 Agent 编程，优先 SCNet／SiliconFlow 的 V4-Flash、Qwen 系列，别只追最强模型。",
+    zhTW: "輸出價往往更傷錢包。長時間 Agent 編程，優先 SCNet／SiliconFlow 的 V4-Flash、Qwen 系列，別只追最強模型。",
+    en: "Output pricing hurts more. For long agent sessions, prefer SCNet / SiliconFlow V4-Flash and Qwen over blindly chasing the strongest model.",
   },
   pRatioTitle: { zhCN: "输出 ÷ 输入 的倍率", zhTW: "輸出 ÷ 輸入 的倍率", en: "Output ÷ input multiplier" },
   pLegendIn: { zhCN: "输入价", zhTW: "輸入價", en: "Input price" },
@@ -157,10 +157,10 @@ const S = {
   fbTitle: { zhCN: "白嫖速报", zhTW: "白嫖速報", en: "Freeload Radar" },
 
   // 全面页
-  lTitleA: { zhCN: "较为全面的", zhTW: "較為全面的", en: "The Full-Spectrum" },
-  lTitleB: { zhCN: "API 价格总结", zhTW: "API 價格總結", en: "API Price Monitor" },
+  lTitleA: { zhCN: "全面", zhTW: "全面", en: "Full" },
+  lTitleB: { zhCN: "价格监测", zhTW: "價格監測", en: "Monitor" },
   lDescA: { zhCN: "在核心账本的基础上，加入 ", zhTW: "在核心帳本的基礎上，加入 ", en: "On top of the core ledger: live monitoring for " },
-  lDescB: { zhCN: " 个主流模型的即时价格监测、最低／最高价、官方网站引导与价格×智力曲线。单位同为 ¥人民币／100 万 Token（M）。", zhTW: " 個主流模型的即時價格監測、最低／最高價、官方網站引導與價格×智力曲線。單位同為 ¥人民幣／100 萬 Token（M）。", en: " mainstream models, floor / ceiling prices, official-site shortcuts and a price × intelligence curve. Unit: ¥ CNY / 1M tokens." },
+  lDescB: { zhCN: " 个模型即时监测、最低／最高价、官网引导与价格×智力曲线。单位 ¥／百万 Token。", zhTW: " 個模型即時監測、最低／最高價、官網引導與價格×智力曲線。單位 ¥／百萬 Token。", en: " models with live monitoring, floor / ceiling prices, official-site links and a price × intelligence curve. Unit: ¥ / 1M tokens." },
   lLive: { zhCN: "LIVE 监测中", zhTW: "LIVE 監測中", en: "LIVE monitoring" },
   lLoading: { zhCN: "正在载入", zhTW: "正在載入", en: "Loading" },
   lPaused: { zhCN: "已暂停自动刷新", zhTW: "已暫停自動刷新", en: "Auto-refresh paused" },
@@ -213,11 +213,11 @@ const S = {
 
   // 智力曲线
   iqTitle: { zhCN: "价格 × 智力曲线", zhTW: "價格 × 智力曲線", en: "Price × Intelligence Curve" },
-  iqDescA: { zhCN: "横轴为输出价（对数尺度，越左越便宜）、纵轴为智力指数估计。越靠近", zhTW: "橫軸為輸出價（對數尺度，越左越便宜）、縱軸為智力指數估計。越靠近", en: "X-axis: output price (log scale — left is cheaper). Y-axis: estimated intelligence. The closer to the " },
-  iqDescB: { zhCN: "左上角", zhTW: "左上角", en: "top-left corner" },
-  iqDescC: { zhCN: "越值得买；虚线是各智力区带的", zhTW: "越值得買；虛線是各智力區帶的", en: ", the better the buy; the dashed line is each IQ band's " },
+  iqDescA: { zhCN: "横轴输出价（对数，左便宜）、纵轴智力指数。越靠近", zhTW: "橫軸輸出價（對數，左便宜）、縱軸智力指數。越靠近", en: "X = output price (log, left cheaper), Y = intelligence. Closer to the " },
+  iqDescB: { zhCN: "左上角", zhTW: "左上角", en: "top-left" },
+  iqDescC: { zhCN: "越值得买；虚线是各智力区带的", zhTW: "越值得買；虛線是各智力區帶的", en: " the better; dashed line marks each band's " },
   iqDescD: { zhCN: "性价比前沿", zhTW: "性價比前沿", en: "value frontier" },
-  iqDescE: { zhCN: "。点平台图例可开关，数据随筛选即时更新。", zhTW: "。點平台圖例可開關，數據隨篩選即時更新。", en: ". Toggle platforms in the legend; data follows your filters live." },
+  iqDescE: { zhCN: "。图例可开关，随筛选即时更新。", zhTW: "。圖例可開關，隨篩選即時更新。", en: ". Toggle platforms in the legend; follows filters live." },
   iqCeiling: { zhCN: "智力天花板", zhTW: "智力天花板", en: "IQ ceiling" },
   iqKing: { zhCN: "性价比之王", zhTW: "性價比之王", en: "Value king" },
   iqCheapest: { zhCN: "最便宜的脑", zhTW: "最便宜的腦", en: "Cheapest brain" },
